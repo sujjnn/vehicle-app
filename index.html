@@ -977,18 +977,11 @@ body {
       </div>
     </div>
     <div class="tab-bar">
-      <button class="tab-btn active" onclick="switchEmpTab('emp-status', this)">차량 현황</button>
+      <button class="tab-btn active" onclick="switchEmpTab('emp-status', this)">차량 예약</button>
       <button class="tab-btn" onclick="switchEmpTab('emp-my-requests', this)">내 신청</button>
-      <button class="tab-btn" onclick="switchEmpTab('emp-new-request', this)">신청하기</button>
     </div>
     <!-- 차량 현황 -->
     <div class="tab-content active" id="emp-status">
-      <!-- 현재 내가 사용중인 차량 강조 -->
-      <div id="emp-my-current" style="display:none;background:linear-gradient(135deg,#1a56db,#1340a8);color:white;border-radius:var(--radius);padding:14px 16px;margin-bottom:12px;">
-        <div style="font-size:11px;opacity:0.8;margin-bottom:4px;">🔑 현재 내가 사용중인 차량</div>
-        <div style="font-size:18px;font-weight:800;" id="emp-my-current-car"></div>
-        <div style="font-size:12px;opacity:0.85;margin-top:2px;" id="emp-my-current-info"></div>
-      </div>
       <!-- 달력 -->
       <div class="calendar-wrap">
         <div class="cal-header">
@@ -997,19 +990,16 @@ body {
           <button class="cal-nav" onclick="changeCalMonth(1,'emp-cal')">&#8250;</button>
         </div>
         <div class="cal-grid" id="emp-cal-grid"></div>
-        <div style="display:flex;gap:10px;margin-top:8px;font-size:11px;color:var(--gray-500);">
-          <span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#f59e0b;margin-right:3px;"></span>대기중</span>
-          <span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--danger);margin-right:3px;"></span>사용중</span>
-          <span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--primary);margin-right:3px;"></span>반납완료</span>
-        </div>
+        <div id="emp-cal-legend" style="display:flex;gap:10px;margin-top:8px;font-size:11px;color:var(--gray-500);flex-wrap:wrap;"></div>
       </div>
-      <div class="section-title">🚗 이용 가능한 차량</div>
+      <div class="section-title">🚗 차량 예약</div>
       <div class="card" style="padding:4px 16px;" id="emp-vehicle-list"></div>
       <div class="section-title" style="margin-top:8px;">📋 이용 안내</div>
       <div class="card">
         <div style="font-size:13px;color:var(--gray-600);line-height:1.8;">
           • 차량 신청 후 인사총무팀 승인 후 이용 가능합니다<br>
-          • 반납 시 계기판 사진 및 차량 상태 사진을 첨부해 주세요<br>
+          • 반납 시 계기판(사용전·후), 앞좌석, 뒷좌석 사진 4장은 <b>필수</b>입니다<br>
+          • 사진 미첨부 시 반납 처리가 불가합니다<br>
         </div>
       </div>
     </div>
@@ -1017,9 +1007,9 @@ body {
     <div class="tab-content" id="emp-my-requests">
       <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;">
         <button class="filter-btn active" onclick="filterMyReqs('all',this)">전체</button>
-        <button class="filter-btn inuse" onclick="filterMyReqs('inuse',this)">사용중</button>
+        <button class="filter-btn pending" onclick="filterMyReqs('pending',this)">예약 대기중</button>
+        <button class="filter-btn inuse" onclick="filterMyReqs('inuse',this)">예약 확정</button>
         <button class="filter-btn returned" onclick="filterMyReqs('returned',this)">반납완료</button>
-        <button class="filter-btn pending" onclick="filterMyReqs('pending',this)">대기중</button>
       </div>
       <div id="my-request-list"></div>
     </div>
@@ -1035,11 +1025,11 @@ body {
       <div class="form-row">
         <div class="form-group">
           <label>출발 일시</label>
-          <input type="datetime-local" id="req-start" onchange="onTimeChange()">
+          <input type="datetime-local" id="req-start" step="1800" onchange="onTimeChange()">
         </div>
         <div class="form-group">
           <label>반납 예정</label>
-          <input type="datetime-local" id="req-end" onchange="onTimeChange()">
+          <input type="datetime-local" id="req-end" step="1800" onchange="onTimeChange()">
         </div>
       </div>
       <div class="form-group" style="margin-bottom:12px;">
@@ -1095,18 +1085,14 @@ body {
       <button class="tab-btn active" onclick="switchAdminTab('admin-status', this)">현황</button>
       <button class="tab-btn" onclick="switchAdminTab('admin-requests', this)">신청내역</button>
       <button class="tab-btn" onclick="switchAdminTab('admin-vehicles', this)">차량관리</button>
-      <button class="tab-btn" onclick="switchAdminTab('admin-mileage', this)">주행거리</button>
       <button class="tab-btn" onclick="switchAdminTab('admin-employees', this)">임직원</button>
       <button class="tab-btn" onclick="switchAdminTab('admin-accounts', this)">계정관리</button>
     </div>
 
     <!-- 현황 -->
     <div class="tab-content active" id="admin-status">
-      <div class="stats-grid">
-        <div class="stat-card" style="cursor:pointer;" onclick="goToStatTab('today')"><div class="stat-num orange" id="s-today">2</div><div class="stat-label">오늘 신청건</div><div class="stat-sub up">↑ 어제 +1건</div></div>
-        <div class="stat-card" style="cursor:pointer;" onclick="goToStatTab('inuse')"><div class="stat-num red" id="s-inuse">1</div><div class="stat-label">운행중 차량</div><div class="stat-sub info" id="s-inuse-sub">3대 중 1대</div></div>
-        <div class="stat-card" style="cursor:pointer;" onclick="goToStatTab('monthly')"><div class="stat-num orange" id="s-monthly">18</div><div class="stat-label">이번달 신청</div><div class="stat-sub dn">지난달 22건</div></div>
-        <div class="stat-card" style="cursor:pointer;" onclick="goToStatTab('available')"><div class="stat-num green" id="s-available">3</div><div class="stat-label">가용 차량</div><div class="stat-sub info">즉시 배차 가능</div></div>
+      <div class="stats-grid" style="grid-template-columns:1fr 1fr;">
+        <div class="stat-card" style="cursor:pointer;grid-column:1/-1;" onclick="goToTodayRequests()"><div class="stat-num orange" id="s-today">0</div><div class="stat-label">오늘 신청건 <span style="font-size:11px;color:var(--primary);font-weight:400;">→ 미승인 내역 보기</span></div></div>
       </div>
 
       <!-- 달력 -->
@@ -1118,16 +1104,14 @@ body {
         </div>
         <div class="cal-grid" id="admin-cal-grid"></div>
         <div style="display:flex;gap:10px;margin-top:8px;font-size:11px;color:var(--gray-500);">
-          <span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#f59e0b;margin-right:3px;"></span>대기중</span>
-          <span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--danger);margin-right:3px;"></span>사용중</span>
-          <span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--primary);margin-right:3px;"></span>반납완료</span>
+          <div id="admin-cal-legend" style="display:flex;gap:10px;margin-top:8px;font-size:11px;color:var(--gray-500);flex-wrap:wrap;"></div>
         </div>
       </div>
 
       <div class="section-title">🚗 실시간 차량 현황</div>
       <div class="card" style="padding:4px 16px;" id="admin-vehicle-status"></div>
       <div class="section-title" style="margin-top:12px;cursor:pointer;" onclick="goToTodayRequests()">👥 오늘 신청자 <span style="font-size:11px;color:var(--primary);font-weight:400;">→ 전체보기</span></div>
-      <div class="card" style="padding:4px 16px;cursor:pointer;" id="admin-today-list" onclick="goToTodayRequests()" title="클릭하면 오늘 신청내역으로 이동"></div>
+      <div class="card" style="padding:4px 16px;cursor:pointer;" id="admin-today-list" onclick="goToTodayRequests()" title="클릭하면 오늘 미승인 신청내역으로 이동"></div>
 
       <!-- 월별 통계 -->
       <div class="section-title" style="margin-top:12px;">📊 이번달 이용 통계</div>
@@ -1137,15 +1121,16 @@ body {
     <!-- 신청내역 -->
     <div class="tab-content" id="admin-requests">
       <div style="display:flex;gap:8px;margin-bottom:10px;">
-        <input type="text" class="search-box" style="margin-bottom:0;flex:1;" placeholder="성명, 목적지, 부서 검색..." id="req-search" oninput="filterAdminReqs()">
+        <input type="text" class="search-box" style="margin-bottom:0;flex:1;" placeholder="성명, 목적지, 부서 검색..." id="req-search" oninput="filterAdminReqs()" onkeydown="if(event.key==='Enter')filterAdminReqs()">
+        <button onclick="filterAdminReqs()" style="padding:10px 14px;background:var(--gray-700);color:white;border:none;border-radius:var(--radius-sm);font-size:13px;font-family:inherit;font-weight:700;cursor:pointer;white-space:nowrap;">🔍 검색</button>
         <button onclick="downloadRequestsCSV()" style="padding:10px 12px;background:var(--success);color:white;border:none;border-radius:var(--radius-sm);font-size:12px;font-family:inherit;font-weight:700;cursor:pointer;white-space:nowrap;">📥 내역</button>
-        <button onclick="downloadMeterPhotos()" style="padding:10px 12px;background:var(--primary);color:white;border:none;border-radius:var(--radius-sm);font-size:12px;font-family:inherit;font-weight:700;cursor:pointer;white-space:nowrap;">📟 사진</button>
+        <button onclick="downloadAllPhotosZip()" style="padding:10px 12px;background:var(--primary);color:white;border:none;border-radius:var(--radius-sm);font-size:12px;font-family:inherit;font-weight:700;cursor:pointer;white-space:nowrap;">📦 사진 ZIP</button>
       </div>
       <div style="display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap;">
         <button class="filter-btn active" onclick="filterAdminStatus('all',this)">전체</button>
-        <button class="filter-btn inuse" onclick="filterAdminStatus('inuse',this)">사용중</button>
+        <button class="filter-btn pending" onclick="filterAdminStatus('pending',this)">예약 대기중</button>
+        <button class="filter-btn inuse" onclick="filterAdminStatus('inuse',this)">예약 확정</button>
         <button class="filter-btn returned" onclick="filterAdminStatus('returned',this)">반납완료</button>
-        <button class="filter-btn pending" onclick="filterAdminStatus('pending',this)">대기중</button>
         <button class="filter-btn" onclick="filterAdminStatus('no-photo',this)" style="border-color:#f59e0b;">📷미첨부</button>
       </div>
       <div id="bulk-approve-bar" style="display:none;background:var(--success-light);border-radius:var(--radius-sm);padding:10px 14px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;">
@@ -1425,41 +1410,38 @@ body {
     </div>
     <div style="background:var(--primary-light);border-radius:var(--radius-sm);padding:10px 14px;margin-bottom:12px;font-size:13px;color:var(--primary);font-weight:600;" id="return-km-result">주행거리: -</div>
 
-    <div class="section-title">📷 계기판 사진 <span style="font-size:11px;color:var(--gray-400);font-weight:400;">사용 전·후 각 1장</span></div>
+    <div class="section-title">📷 반납 사진 <span style="color:var(--danger);font-size:11px;">* 4장 모두 필수</span></div>
+    <div style="font-size:12px;color:var(--gray-500);margin-bottom:10px;background:var(--warning-light);border-radius:var(--radius-sm);padding:8px 12px;">⚠️ 4장 모두 첨부해야 반납 처리가 가능합니다</div>
     <div class="photo-grid" style="margin-bottom:16px;">
       <label class="photo-slot" id="slot-meter-before" for="photo-meter-before">
         <input type="file" id="photo-meter-before" accept="image/*" style="display:none" onchange="previewPhoto(this,'slot-meter-before')">
         <button class="photo-remove" onclick="removePhoto(event,'slot-meter-before','photo-meter-before')">✕</button>
         <div class="photo-slot-icon">📟</div>
-        <div class="photo-slot-label">사용 전 계기판</div>
+        <div class="photo-slot-label">계기판 (사용 전) <span style="color:var(--danger)">*</span></div>
       </label>
       <label class="photo-slot" id="slot-meter-after" for="photo-meter-after">
         <input type="file" id="photo-meter-after" accept="image/*" style="display:none" onchange="previewPhoto(this,'slot-meter-after')">
         <button class="photo-remove" onclick="removePhoto(event,'slot-meter-after','photo-meter-after')">✕</button>
         <div class="photo-slot-icon">📟</div>
-        <div class="photo-slot-label">사용 후 계기판</div>
+        <div class="photo-slot-label">계기판 (사용 후) <span style="color:var(--danger)">*</span></div>
+      </label>
+      <label class="photo-slot" id="slot-seat-front" for="photo-seat-front">
+        <input type="file" id="photo-seat-front" accept="image/*" style="display:none" onchange="previewPhoto(this,'slot-seat-front')">
+        <button class="photo-remove" onclick="removePhoto(event,'slot-seat-front','photo-seat-front')">✕</button>
+        <div class="photo-slot-icon">🪑</div>
+        <div class="photo-slot-label">앞좌석 <span style="color:var(--danger)">*</span></div>
+      </label>
+      <label class="photo-slot" id="slot-seat-back" for="photo-seat-back">
+        <input type="file" id="photo-seat-back" accept="image/*" style="display:none" onchange="previewPhoto(this,'slot-seat-back')">
+        <button class="photo-remove" onclick="removePhoto(event,'slot-seat-back','photo-seat-back')">✕</button>
+        <div class="photo-slot-icon">🪑</div>
+        <div class="photo-slot-label">뒷좌석 <span style="color:var(--danger)">*</span></div>
       </label>
     </div>
 
     <div class="section-title">🅿️ 주차 위치 <span style="color:var(--danger);font-size:11px;">* 필수</span></div>
     <div class="form-group" style="margin-bottom:16px;">
       <input type="text" id="return-parking" placeholder="예: 지하 2층 B구역 15번" style="width:100%;padding:12px;border:1.5px solid var(--gray-200);border-radius:var(--radius-sm);font-family:inherit;font-size:14px;outline:none;" onfocus="this.style.borderColor='var(--primary)'" onblur="this.style.borderColor='var(--gray-200)'">
-    </div>
-
-    <div class="section-title">📸 차량 사진 <span style="font-size:11px;color:var(--gray-400);font-weight:400;">각 1장씩 (선택)</span></div>
-    <div class="photo-grid">
-      <label class="photo-slot" id="slot-ext-front" for="photo-ext-front">
-        <input type="file" id="photo-ext-front" accept="image/*" style="display:none" onchange="previewPhoto(this,'slot-ext-front')">
-        <button class="photo-remove" onclick="removePhoto(event,'slot-ext-front','photo-ext-front')">✕</button>
-        <div class="photo-slot-icon">🚗</div>
-        <div class="photo-slot-label">차량 외부</div>
-      </label>
-      <label class="photo-slot" id="slot-int-front" for="photo-int-front">
-        <input type="file" id="photo-int-front" accept="image/*" style="display:none" onchange="previewPhoto(this,'slot-int-front')">
-        <button class="photo-remove" onclick="removePhoto(event,'slot-int-front','photo-int-front')">✕</button>
-        <div class="photo-slot-icon">🪑</div>
-        <div class="photo-slot-label">차량 내부</div>
-      </label>
     </div>
 
     <div class="section-title" style="margin-top:4px;">📝 차량 상태 메모</div>
@@ -1483,11 +1465,11 @@ body {
     <div class="form-row" style="margin-bottom:12px;">
       <div class="form-group">
         <label>출발 일시</label>
-        <input type="datetime-local" id="emp-req-edit-start" onchange="checkEmpReqConflict()">
+        <input type="datetime-local" id="emp-req-edit-start" step="1800" onchange="checkEmpReqConflict()">
       </div>
       <div class="form-group">
         <label>반납 예정</label>
-        <input type="datetime-local" id="emp-req-edit-end" onchange="checkEmpReqConflict()">
+        <input type="datetime-local" id="emp-req-edit-end" step="1800" onchange="checkEmpReqConflict()">
       </div>
     </div>
 
@@ -1685,6 +1667,48 @@ body {
     <div id="view-photos-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;"></div>
     <div id="view-photos-memo" style="display:none;background:var(--gray-50);border-radius:var(--radius-sm);padding:10px 12px;font-size:13px;color:var(--gray-600);margin-bottom:14px;"></div>
     <button class="btn btn-secondary" style="width:100%;justify-content:center;" onclick="closeModal('modal-view-photos')">닫기</button>
+  </div>
+</div>
+
+<!-- 예약하기 모달 (차량현황 탭에서 바로 예약) -->
+<div class="modal-overlay" id="modal-booking">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">🚗 차량 예약 신청</div>
+    <div class="modal-subtitle" id="booking-vehicle-info"></div>
+
+    <div class="form-group" style="margin-bottom:12px;">
+      <label>이용 목적 <span style="color:var(--danger)">*</span></label>
+      <input type="text" id="booking-purpose" placeholder="예: 고객사 방문, 출장">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>출발 일시 <span style="color:var(--danger)">*</span></label>
+        <input type="datetime-local" id="booking-start" step="1800" onchange="checkBookingConflict()">
+      </div>
+      <div class="form-group">
+        <label>반납 예정 <span style="color:var(--danger)">*</span></label>
+        <input type="datetime-local" id="booking-end" step="1800" onchange="checkBookingConflict()">
+      </div>
+    </div>
+    <div class="form-group" style="margin-bottom:12px;">
+      <label>목적지 <span style="color:var(--danger)">*</span></label>
+      <input type="text" id="booking-dest" placeholder="예: 강남구 고객사">
+    </div>
+    <div id="booking-conflict-alert" style="display:none;background:var(--danger-light);border-radius:var(--radius-sm);padding:10px 14px;margin-bottom:10px;font-size:13px;color:var(--danger);font-weight:600;">
+      🚫 해당 시간대에 차량 예약이 불가합니다.
+    </div>
+    <div id="booking-ok-alert" style="display:none;background:var(--success-light);border-radius:var(--radius-sm);padding:10px 14px;margin-bottom:10px;font-size:13px;color:var(--success);font-weight:600;">
+      ✅ 선택한 시간에 예약 가능합니다!
+    </div>
+    <div class="form-group" style="margin-bottom:16px;">
+      <label>비고</label>
+      <textarea id="booking-memo" placeholder="추가 요청사항"></textarea>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-primary" style="flex:1;justify-content:center;" onclick="submitBooking()">신청서 제출</button>
+      <button class="btn btn-secondary" onclick="closeModal('modal-booking')">취소</button>
+    </div>
   </div>
 </div>
 
@@ -2010,20 +2034,37 @@ function getLatestParking(vehicleName) {
 function renderEmpVehicles() {
   const el = document.getElementById('emp-vehicle-list');
   el.innerHTML = vehicles.map(v => {
-    const parking = v.status === 'available' ? getLatestParking(v.name) : null;
-    const inuseReq = requests.find(r => r.vehicle === v.name && r.status === 'inuse');
+    const parking = getLatestParking(v.name);
+    // 현재 시간 기준 활성 예약 (pending/inuse 모두)
+    const now = Date.now();
+    const activeReqs = requests.filter(r =>
+      r.vehicle === v.name &&
+      ['pending','inuse'].includes(r.status) &&
+      r.startTime && r.endTime
+    ).sort((a,b) => new Date(a.startTime) - new Date(b.startTime));
+
+    const activeInfo = activeReqs.slice(0,2).map(r => {
+      const rs = new Date(r.startTime).getTime();
+      const re = new Date(r.endTime).getTime();
+      const isCurrent = now >= rs && now < re;
+      return `<div style="font-size:11px;color:${isCurrent?'var(--danger)':'var(--warning)'};margin-top:2px;">
+        ${isCurrent ? '🚗' : '📅'} ${r.date} ${r.time} · ${r.name}
+        <span style="font-size:10px;">(${isCurrent?'사용중':'예약중'})</span>
+      </div>`;
+    }).join('');
+
     return `
-    <div class="vehicle-item">
+    <div class="vehicle-item" style="flex-wrap:wrap;gap:8px;">
       <div class="vehicle-icon">${v.icon}</div>
-      <div class="vehicle-info">
+      <div class="vehicle-info" style="flex:1;min-width:0;">
         <div class="vehicle-name">${v.name} <span style="font-size:11px;color:var(--gray-400)">(${v.size})</span></div>
         <div class="vehicle-plate">${v.plate}</div>
-        ${v.status === 'available' && parking
-          ? `<div style="font-size:12px;color:var(--primary);font-weight:600;margin-top:3px;background:var(--primary-light);padding:3px 8px;border-radius:6px;display:inline-block;">🅿️ ${parking}</div>`
-          : v.status === 'available' ? `<div style="font-size:11px;color:var(--gray-400);margin-top:2px;">주차위치 미등록</div>` : ''}
-        ${v.status === 'inuse' && inuseReq ? `<div style="font-size:11px;color:var(--warning);margin-top:2px;">🕐 ${inuseReq.time} · ${inuseReq.name}</div>` : ''}
+        ${parking ? `<div style="font-size:12px;color:var(--primary);font-weight:600;margin-top:3px;background:var(--primary-light);padding:3px 8px;border-radius:6px;display:inline-block;">🅿️ ${parking}</div>` : `<div style="font-size:11px;color:var(--gray-400);margin-top:2px;">주차위치 미등록</div>`}
+        ${activeInfo}
       </div>
-      <span class="badge badge-${v.status}">${statusLabel(v.status)}</span>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;">
+        <button onclick="openBookingModal(${v.id})" style="padding:6px 14px;background:var(--primary);color:white;border:none;border-radius:20px;font-size:12px;font-family:inherit;font-weight:700;cursor:pointer;white-space:nowrap;">예약하기</button>
+      </div>
     </div>`;
   }).join('');
 }
@@ -2064,9 +2105,80 @@ function renderMyRequests() {
       </div>
       ${r.status === 'inuse' ? `<button class="return-btn" onclick="openReturnModal(${r.id})">🔑 반납하기</button>` : ''}
       ${(r.status === 'pending' || r.status === 'inuse') ? `<button onclick="openEmpReqEditModal(${r.id})" style="margin-top:8px;width:100%;padding:8px;background:var(--primary-light);color:var(--primary);border:none;border-radius:var(--radius-sm);font-size:13px;font-family:inherit;font-weight:600;cursor:pointer;">✏️ ${r.status === 'inuse' ? '시간 연장' : '신청 수정'}</button>` : ''}
-      ${r.status === 'pending' ? `<button onclick="cancelMyRequest(${r.id})" style="margin-top:6px;width:100%;padding:8px;background:var(--danger-light);color:var(--danger);border:none;border-radius:var(--radius-sm);font-size:13px;font-family:inherit;font-weight:600;cursor:pointer;">✕ 신청 취소</button>` : ''}
+      ${(r.status === 'pending' || r.status === 'inuse') ? `<button onclick="cancelMyRequest(${r.id})" style="margin-top:6px;width:100%;padding:8px;background:var(--danger-light);color:var(--danger);border:none;border-radius:var(--radius-sm);font-size:13px;font-family:inherit;font-weight:600;cursor:pointer;">✕ ${r.status === 'inuse' ? '예약 취소' : '신청 취소'}</button>` : ''}
       ${r.status === 'returned' ? `<button onclick="openEmpEditModal(${r.id})" style="margin-top:8px;width:100%;padding:8px;background:var(--gray-100);color:var(--gray-600);border:none;border-radius:var(--radius-sm);font-size:13px;font-family:inherit;font-weight:600;cursor:pointer;">✏️ 사진·주차위치 수정</button>` : ''}
     </div>`).join('');
+}
+
+// ============================================================
+// 차량현황 탭 예약하기 모달
+// ============================================================
+let bookingVehicleId = null;
+
+function openBookingModal(vid) {
+  bookingVehicleId = vid;
+  const v = vehicles.find(v => v.id == vid);
+  document.getElementById('booking-vehicle-info').textContent = `${v.icon} ${v.name} (${v.size}) · ${v.plate}`;
+  document.getElementById('booking-purpose').value = '';
+  document.getElementById('booking-dest').value = '';
+  document.getElementById('booking-memo').value = '';
+  document.getElementById('booking-start').value = '';
+  document.getElementById('booking-end').value = '';
+  document.getElementById('booking-conflict-alert').style.display = 'none';
+  document.getElementById('booking-ok-alert').style.display = 'none';
+  document.getElementById('modal-booking').classList.add('open');
+}
+
+function checkBookingConflict() {
+  const v = vehicles.find(v => v.id == bookingVehicleId);
+  if (!v) return;
+  const startStr = document.getElementById('booking-start').value;
+  const endStr = document.getElementById('booking-end').value;
+  const conflict = document.getElementById('booking-conflict-alert');
+  const okAlert = document.getElementById('booking-ok-alert');
+  conflict.style.display = 'none'; okAlert.style.display = 'none';
+  if (!startStr || !endStr) return;
+  if (endStr <= startStr) {
+    conflict.textContent = '⚠️ 반납 예정 시간이 출발 시간보다 빠릅니다.';
+    conflict.style.display = 'block'; return;
+  }
+  const info = getConflictInfo(v.name, startStr, endStr, null);
+  if (info) {
+    conflict.textContent = info.isInUse
+      ? `🚫 ${info.name}님이 사용중입니다. 다른 시간대 또는 다른 차량을 선택해 주세요.`
+      : `🚫 ${info.name}님이 예약중입니다. 다른 시간대 또는 다른 차량을 선택해 주세요.`;
+    conflict.style.display = 'block';
+  } else {
+    okAlert.style.display = 'block';
+  }
+}
+
+async function submitBooking() {
+  const v = vehicles.find(v => v.id == bookingVehicleId);
+  const purpose = document.getElementById('booking-purpose').value.trim();
+  const dest = document.getElementById('booking-dest').value.trim();
+  const startStr = document.getElementById('booking-start').value;
+  const endStr = document.getElementById('booking-end').value;
+  if (!purpose || !dest) { showToast('목적과 목적지를 입력해 주세요'); return; }
+  if (!startStr || !endStr) { showToast('출발 일시와 반납 예정 시간을 입력해 주세요'); return; }
+  if (endStr <= startStr) { showToast('반납 예정 시간이 출발 시간보다 빠릅니다'); return; }
+  if (isTimeConflict(v.name, startStr, endStr, null)) {
+    showToast('🚫 해당 시간대에 차량 예약이 불가합니다'); return;
+  }
+  // 동의서 먼저
+  closeModal('modal-booking');
+  // 신청하기 탭 데이터 임시 저장 후 동의서 오픈
+  document.getElementById('req-purpose') && (document.getElementById('req-purpose').value = purpose);
+  document.getElementById('req-dest') && (document.getElementById('req-dest').value = dest);
+  document.getElementById('req-start') && (document.getElementById('req-start').value = startStr);
+  document.getElementById('req-end') && (document.getElementById('req-end').value = endStr);
+  // req-vehicle select 세팅
+  const sel = document.getElementById('req-vehicle');
+  if (sel) {
+    populateVehicleSelect();
+    sel.value = String(v.id);
+  }
+  openConsentModal();
 }
 
 function populateVehicleSelect() {
@@ -2083,19 +2195,30 @@ function timeToMs(dtStr) {
   return new Date(dtStr).getTime();
 }
 
-function isTimeConflict(vehicleName, startStr, endStr, excludeId) {
+// 충돌 체크: null=없음, 객체={name, status, time} 반환
+function getConflictInfo(vehicleName, startStr, endStr, excludeId) {
   const s = timeToMs(startStr);
   const e = timeToMs(endStr);
-  if (!s || !e) return false;
-  return requests.some(r => {
-    if (excludeId && r.id === excludeId) return false;
-    if (r.vehicle !== vehicleName) return false;
-    if (['returned','cancelled'].includes(r.status)) return false;
+  if (!s || !e) return null;
+  const now = Date.now();
+  for (const r of requests) {
+    if (excludeId && r.id === excludeId) continue;
+    if (r.vehicle !== vehicleName) continue;
+    if (['returned','cancelled'].includes(r.status)) continue;
     const rs = timeToMs(r.startTime);
     const re = timeToMs(r.endTime);
-    if (!rs || !re) return false;
-    return s < re && e > rs;
-  });
+    if (!rs || !re) continue;
+    if (s < re && e > rs) {
+      // 사용 시간대인지 판단: 지금 now가 rs~re 사이면 사용중, 아니면 예약중
+      const isInUse = now >= rs && now < re;
+      return { name: r.name, isInUse, time: r.time, date: r.date };
+    }
+  }
+  return null;
+}
+
+function isTimeConflict(vehicleName, startStr, endStr, excludeId) {
+  return getConflictInfo(vehicleName, startStr, endStr, excludeId) !== null;
 }
 
 function onVehicleChange() { checkAvailability(); }
@@ -2140,7 +2263,11 @@ function checkAvailability() {
       conflict.style.display = 'block';
       return;
     }
-    if (isTimeConflict(v.name, startStr, endStr, null)) {
+    const info = getConflictInfo(v.name, startStr, endStr, null);
+    if (info) {
+      conflict.textContent = info.isInUse
+        ? `🚫 ${info.name}님이 사용중입니다. 다른 시간대 또는 다른 차량을 선택해 주세요.`
+        : `🚫 ${info.name}님이 예약중입니다. 다른 시간대 또는 다른 차량을 선택해 주세요.`;
       conflict.style.display = 'block';
     } else {
       okAlert.style.display = 'block';
@@ -2307,9 +2434,10 @@ function openReturnModal(reqId) {
   document.getElementById('return-km-result').textContent = '주행거리: -';
   document.getElementById('return-memo').value = '';
   document.getElementById('return-parking').value = '';
-  // Reset photos (계기판 포함)
-  ['slot-meter-before','slot-meter-after','slot-ext-front','slot-int-front'].forEach(id => {
+  // Reset photos 4장
+  ['slot-meter-before','slot-meter-after','slot-seat-front','slot-seat-back'].forEach(id => {
     const slot = document.getElementById(id);
+    if (!slot) return;
     slot.classList.remove('has-photo');
     const img = slot.querySelector('img');
     if (img) img.remove();
@@ -2359,7 +2487,7 @@ async function confirmReturn() {
   const afterVal  = parseFloat(document.getElementById('meter-after').value);
   const parkingLocation = document.getElementById('return-parking').value.trim();
 
-  // 필수 검증
+  // 필수 검증 - 계기판
   if (!beforeVal) {
     showToast('🚫 사용 전 계기판을 입력해 주세요');
     document.getElementById('meter-before').style.borderColor = 'var(--danger)';
@@ -2375,6 +2503,28 @@ async function confirmReturn() {
     document.getElementById('meter-after').style.borderColor = 'var(--danger)';
     return;
   }
+
+  // 사진 4장 필수 검증
+  const requiredSlots = [
+    { id: 'slot-meter-before', label: '계기판(사용 전)' },
+    { id: 'slot-meter-after',  label: '계기판(사용 후)' },
+    { id: 'slot-seat-front',   label: '앞좌석' },
+    { id: 'slot-seat-back',    label: '뒷좌석' },
+  ];
+  for (const s of requiredSlots) {
+    const slot = document.getElementById(s.id);
+    if (!slot || !slot.classList.contains('has-photo')) {
+      showToast(`🚫 ${s.label} 사진을 첨부해 주세요`);
+      if (slot) slot.style.borderColor = 'var(--danger)';
+      return;
+    }
+  }
+  // 테두리 초기화
+  requiredSlots.forEach(s => {
+    const slot = document.getElementById(s.id);
+    if (slot) slot.style.borderColor = '';
+  });
+
   if (!parkingLocation) {
     showToast('🚫 주차 위치를 입력해 주세요');
     document.getElementById('return-parking').style.borderColor = 'var(--danger)';
@@ -2384,9 +2534,9 @@ async function confirmReturn() {
   document.getElementById('meter-after').style.borderColor = '';
   document.getElementById('return-parking').style.borderColor = '';
 
-  // 사진 수집 (계기판 + 차량 2장)
-  const photoSlots  = ['slot-meter-before','slot-meter-after','slot-ext-front','slot-int-front'];
-  const photoLabels = ['계기판사용전','계기판사용후','차량외부','차량내부'];
+  // 사진 수집 (4장)
+  const photoSlots  = ['slot-meter-before','slot-meter-after','slot-seat-front','slot-seat-back'];
+  const photoLabels = ['계기판사용전','계기판사용후','앞좌석','뒷좌석'];
   const photos = {};
   photoSlots.forEach((slotId, i) => {
     const slot = document.getElementById(slotId);
@@ -2403,8 +2553,7 @@ async function confirmReturn() {
     r.photos          = photos;
     r.returnMemo      = memo;
     r.parkingLocation = parkingLocation;
-    const v = vehicles.find(v => v.name === r.vehicle);
-    if (v) { v.status = 'available'; await dbUpdate('vehicles', v.id, {status:'available'}); }
+    // 차량 status 변경 없음 — 시간 단위로만 관리
     await dbUpdate('requests', r.id, {
       status:'returned', meter_before: beforeVal, meter_after: afterVal,
       photos, return_memo: memo, parking_location: parkingLocation,
@@ -2423,31 +2572,6 @@ async function confirmReturn() {
 // ADMIN STATUS
 // ============================================================
 function renderAdminStatus() {
-  const av = vehicles.filter(v => v.status==='available').length;
-  const iu = vehicles.filter(v => v.status==='inuse').length;
-  document.getElementById('s-available').textContent = av;
-  document.getElementById('s-inuse').textContent = iu;
-  document.getElementById('s-inuse-sub').textContent = `${vehicles.length}대 중 ${iu}대`;
-
-  // 실시간 차량현황 — 대기중 신청도 반영
-  const today = new Date().toLocaleDateString('ko-KR',{month:'2-digit',day:'2-digit'}).replace(/\. /g,'/').replace('.','');
-  document.getElementById('admin-vehicle-status').innerHTML = vehicles.map(v => {
-    const pendingReq = requests.find(r => r.vehicle === v.name && r.status === 'pending');
-    const displayStatus = v.status === 'available' && pendingReq ? 'pending' : v.status;
-    const parking = v.status === 'available' ? getLatestParking(v.name) : null;
-    return `
-    <div class="vehicle-item">
-      <div class="vehicle-icon">${v.icon}</div>
-      <div class="vehicle-info">
-        <div class="vehicle-name">${v.name} <span style="font-size:11px;color:var(--gray-400)">(${v.size})</span></div>
-        <div class="vehicle-plate">${v.plate}</div>
-        ${parking ? `<div style="font-size:12px;color:var(--primary);font-weight:600;margin-top:3px;background:var(--primary-light);padding:3px 8px;border-radius:6px;display:inline-block;">🅿️ ${parking}</div>` : v.status === 'available' ? `<div style="font-size:11px;color:var(--gray-400);margin-top:2px;">주차위치 미등록</div>` : ''}
-        ${pendingReq ? `<div style="font-size:11px;color:var(--warning);margin-top:2px;">🕐 ${pendingReq.time} 대기중</div>` : ''}
-      </div>
-      <span class="badge badge-${displayStatus}">${statusLabel(displayStatus)}</span>
-    </div>`;
-  }).join('');
-
   // 오늘 날짜 기반으로 필터
   const now = new Date();
   const todayFmt = `${String(now.getMonth()+1).padStart(2,'0')}/${String(now.getDate()).padStart(2,'0')}`;
@@ -2457,7 +2581,42 @@ function renderAdminStatus() {
     (r.startTime && r.startTime.startsWith(todayISO))
   ).sort((a,b) => (a.startTime||'') > (b.startTime||'') ? 1 : -1);
 
-  document.getElementById('admin-today-list').innerHTML = (todayReqs.length ? todayReqs.slice(0,5) : requests.slice(0,3)).map(r=>`
+  // 오늘 신청건 카운트
+  document.getElementById('s-today').textContent = todayReqs.length;
+
+  // 실시간 차량현황 — 시간 기반으로만 표시
+  const nowMs = Date.now();
+  document.getElementById('admin-vehicle-status').innerHTML = vehicles.map(v => {
+    const parking = getLatestParking(v.name);
+    const activeReqs = requests.filter(r =>
+      r.vehicle === v.name && ['pending','inuse'].includes(r.status) && r.startTime && r.endTime
+    ).sort((a,b) => new Date(a.startTime) - new Date(b.startTime));
+
+    const activeInfo = activeReqs.slice(0,3).map(r => {
+      const rs = new Date(r.startTime).getTime();
+      const re = new Date(r.endTime).getTime();
+      const isCurrent = nowMs >= rs && nowMs < re;
+      return `<div style="font-size:11px;color:${isCurrent?'var(--danger)':'var(--warning)'};margin-top:2px;">
+        ${isCurrent ? '🚗' : '📅'} ${r.date} ${r.time} · ${r.name} (${r.dept})
+        <span style="font-size:10px;">(${isCurrent?'사용중':'예약중'})</span>
+      </div>`;
+    }).join('');
+
+    return `
+    <div class="vehicle-item" style="flex-wrap:wrap;">
+      <div class="vehicle-icon">${v.icon}</div>
+      <div class="vehicle-info" style="flex:1;">
+        <div class="vehicle-name">${v.name} <span style="font-size:11px;color:var(--gray-400)">(${v.size})</span></div>
+        <div class="vehicle-plate">${v.plate}</div>
+        ${parking ? `<div style="font-size:12px;color:var(--primary);font-weight:600;margin-top:3px;background:var(--primary-light);padding:3px 8px;border-radius:6px;display:inline-block;">🅿️ ${parking}</div>` : `<div style="font-size:11px;color:var(--gray-400);margin-top:2px;">주차위치 미등록</div>`}
+        ${activeInfo || `<div style="font-size:11px;color:var(--success);margin-top:2px;">✅ 예약 없음</div>`}
+      </div>
+    </div>`;
+  }).join('');
+
+  // 오늘 신청자 — 오늘 신청한 사람만 표시
+  document.getElementById('admin-today-list').innerHTML = todayReqs.length
+    ? todayReqs.slice(0,5).map(r=>`
     <div class="req-item" onclick="goToTodayRequests()">
       <div class="req-icon">${r.icon}</div>
       <div class="req-body">
@@ -2469,7 +2628,8 @@ function renderAdminStatus() {
       <div class="req-meta">
         <span class="badge badge-${r.status}">${statusLabel(r.status)}</span>
       </div>
-    </div>`).join('') || '<div style="padding:16px;text-align:center;color:var(--gray-400);font-size:13px;">오늘 신청 없음</div>';
+    </div>`).join('')
+    : '<div style="padding:16px;text-align:center;color:var(--gray-400);font-size:13px;">오늘 신청 없음</div>';
 
   renderCalendar('admin-cal');
   renderMonthlyStats();
@@ -2666,13 +2826,7 @@ async function saveEditReq() {
   const newName = document.getElementById('edit-req-name').value.trim();
   const newVehicle = document.getElementById('edit-req-vehicle').value;
   const newStatus = document.getElementById('edit-req-status').value;
-  if (newVehicle !== r.vehicle || newStatus !== r.status) {
-    const oldV = vehicles.find(v => v.name === r.vehicle);
-    const newV = vehicles.find(v => v.name === newVehicle);
-    if (oldV && r.status === 'inuse') { oldV.status = 'available'; await dbUpdate('vehicles', oldV.id, {status:'available'}); }
-    if (newV && newStatus === 'inuse') { newV.status = 'inuse'; await dbUpdate('vehicles', newV.id, {status:'inuse'}); }
-    else if (newV && newStatus !== 'inuse') { newV.status = 'available'; await dbUpdate('vehicles', newV.id, {status:'available'}); }
-  }
+  // 차량 status 변경 없음 — 시간 단위로만 관리
   r.name = newName;
   r.dept = document.getElementById('edit-req-dept').value.trim();
   r.vehicle = newVehicle;
@@ -2718,11 +2872,6 @@ async function saveEditReq() {
 
 async function deleteReq(id) {
   if (!confirm('이 신청 내역을 삭제하시겠습니까?')) return;
-  const r = requests.find(x => x.id === id);
-  if (r && r.status === 'inuse') {
-    const v = vehicles.find(v => v.name === r.vehicle);
-    if (v) { v.status = 'available'; await dbUpdate('vehicles', v.id, {status:'available'}); }
-  }
   await dbDelete('requests', id);
   requests = requests.filter(x => x.id !== id);
   renderAdminRequests(document.getElementById('req-search').value);
@@ -2734,19 +2883,12 @@ async function approveReq(id) {
   const r = requests.find(x => x.id===id);
   if (r) {
     r.status = 'inuse';
-    const v = vehicles.find(v => v.name === r.vehicle);
-    if (v) { v.status = 'inuse'; await dbUpdate('vehicles', v.id, {status:'inuse'}); }
+    // 차량 status는 건드리지 않음 — 시간 단위로만 예약 관리
     await dbUpdate('requests', r.id, {status:'inuse'});
     renderAdminRequests(document.getElementById('req-search').value);
     renderAdminStatus();
-    showToast('신청이 승인되었습니다');
-    notifyApproved(r);
-    sendTeamsAlert('✅ 차량 신청 승인 완료', [
-      ['승인 대상', `${r.name} (${r.dept})`],
-      ['차량', r.vehicle],
-      ['일시', `${r.date} ${r.time}`],
-      ['목적지', r.dest],
-    ], 'good');
+    renderEmpVehicles && renderEmpVehicles();
+    showToast('신청이 승인되었습니다 ✅');
   }
 }
 
@@ -2965,7 +3107,7 @@ async function sendTeamsAlert(title, facts, color) {
   }
 }
 
-// 신청 제출 → 관리자 Teams 알림
+// 신청 제출 → 관리자 Teams 알림 (신청접수)
 function notifyNewRequest(r) {
   sendTeamsAlert(
     '🚗 새 차량 신청이 접수되었습니다',
@@ -2980,28 +3122,11 @@ function notifyNewRequest(r) {
   );
 }
 
-// 승인 → 직원 웹푸시
-function notifyApproved(r) {
-  sendPushNotification(
-    '✅ 차량 신청이 승인되었습니다',
-    `${r.vehicle} · ${r.date} ${r.time}\n출발지: ${r.dest}`
-  );
-}
+// 승인 알람 제거 (신청접수/반납완료만 운영)
+function notifyApproved(r) { /* 알람 없음 */ }
 
-// 연장 신청 → 관리자 Teams 알림
-function notifyExtended(r, oldTime, newTime) {
-  sendTeamsAlert(
-    '🔄 차량 사용 연장 신청',
-    [
-      ['신청자', `${r.name} (${r.dept})`],
-      ['차량', r.vehicle],
-      ['기존 시간', oldTime],
-      ['변경 시간', newTime],
-      ['목적지', r.dest],
-    ],
-    'warning'
-  );
-}
+// 연장 알람 제거
+function notifyExtended(r, oldTime, newTime) { /* 알람 없음 */ }
 
 // 반납 완료 → 관리자 Teams 알림
 function notifyReturned(r) {
@@ -3121,9 +3246,16 @@ function renderCalendar(prefix) {
       return rDate === dateStr;
     });
 
-    const dots = dayReqs.slice(0,4).map(r =>
-      `<div class="cal-dot ${r.status}"></div>`
-    ).join('');
+    // 차량별 색상 맵 (차량 이름 기반)
+    const vColorMap = {};
+    const vColors = ['#1a56db','#10b981','#f59e0b','#ef4444','#8b5cf6','#ec4899'];
+    vehicles.forEach((v, i) => { vColorMap[v.name] = vColors[i % vColors.length]; });
+
+    const dots = dayReqs.slice(0,4).map(r => {
+      const color = vColorMap[r.vehicle] || '#9ca3af';
+      const opacity = r.status === 'returned' ? '0.4' : '1';
+      return `<div class="cal-dot" style="background:${color};opacity:${opacity};" title="${r.vehicle} ${r.name}"></div>`;
+    }).join('');
 
     const colorClass = dayOfWeek === 0 ? 'sun' : dayOfWeek === 6 ? 'sat' : '';
     html += `<div class="cal-day${isToday?' today':''}" onclick="showCalDay('${dateStr}','${prefix}')">
@@ -3140,6 +3272,15 @@ function renderCalendar(prefix) {
   }
 
   gridEl.innerHTML = html;
+
+  // 차량별 색상 범례 렌더링
+  const vColors = ['#1a56db','#10b981','#f59e0b','#ef4444','#8b5cf6','#ec4899'];
+  const legendEl = document.getElementById(prefix + '-legend');
+  if (legendEl) {
+    legendEl.innerHTML = vehicles.map((v, i) =>
+      `<span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${vColors[i % vColors.length]};margin-right:3px;"></span>${v.name}</span>`
+    ).join('') + `<span style="margin-left:4px;opacity:0.5;">● 반납완료(흐림)</span>`;
+  }
 }
 
 function changeCalMonth(dir, prefix) {
@@ -3183,7 +3324,7 @@ function showCalDay(dateStr, prefix) {
           <div class="cal-event-time">🕐 ${r.time || '시간미정'} · ${r.vehicle}</div>
           <div class="cal-event-name">${r.name} <span style="font-size:11px;font-weight:400;color:var(--gray-500);">${r.dept}</span></div>
           <div class="cal-event-sub">📍 ${r.dest} · ${r.purpose}</div>
-          <div class="cal-event-sub">${{pending:'⏳ 승인 대기중',inuse:'🚗 사용중',returned:'✅ 반납완료'}[r.status]||r.status}</div>
+          <div class="cal-event-sub">${{pending:'⏳ 예약 대기중',inuse:'🚗 예약 확정',returned:'✅ 반납완료'}[r.status]||r.status}</div>
         </div>`).join('')}
     </div>`;
   popup.onclick = e => { if (e.target === popup) popup.remove(); };
@@ -3264,10 +3405,8 @@ async function bulkApprove() {
     const r = requests.find(x => x.id === id);
     if (r && r.status === 'pending') {
       r.status = 'inuse';
-      const v = vehicles.find(v => v.name === r.vehicle);
-      if (v) { v.status = 'inuse'; await dbUpdate('vehicles', v.id, {status:'inuse'}); }
+      // 차량 status 변경 없음 — 시간 단위로만 관리
       await dbUpdate('requests', r.id, {status:'inuse'});
-      notifyApproved(r);
     }
   }
   selectedPendingIds.clear();
@@ -3444,21 +3583,44 @@ function setReqDate(dateStr) {
 }
 
 // ============================================================
-// 계기판 사진 다운로드
+// 전체 반납 사진 ZIP 다운로드 (JSZip 사용)
 // ============================================================
-function downloadMeterPhotos() {
-  const list = requests.filter(r => r.photos && (r.photos['계기판사용전']||r.photos['계기판사용후']));
-  if (!list.length) { showToast('계기판 사진이 있는 내역이 없습니다'); return; }
-  list.forEach(r => {
-    ['계기판사용전','계기판사용후'].forEach(key => {
-      if (!r.photos[key]) return;
-      const a = document.createElement('a');
-      a.href = r.photos[key];
-      a.download = `계기판_${r.name}_${r.date.replace('/','')}_${key}.jpg`;
-      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+async function downloadAllPhotosZip() {
+  const withPhotos = requests.filter(r => r.photos && Object.values(r.photos).some(p => p));
+  if (!withPhotos.length) { showToast('다운로드할 사진이 없습니다'); return; }
+
+  showToast('⏳ ZIP 파일 생성 중...');
+
+  // JSZip 동적 로드
+  if (typeof JSZip === 'undefined') {
+    await new Promise((resolve, reject) => {
+      const s = document.createElement('script');
+      s.src = 'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js';
+      s.onload = resolve; s.onerror = reject;
+      document.head.appendChild(s);
+    });
+  }
+
+  const zip = new JSZip();
+
+  withPhotos.forEach(r => {
+    const folderName = `${r.date.replace('/','')}_${r.name}_${r.vehicle}`.replace(/[^a-zA-Z0-9가-힣_\-]/g, '_');
+    const folder = zip.folder(folderName);
+    Object.entries(r.photos).forEach(([label, src]) => {
+      if (!src || !src.startsWith('data:')) return;
+      const base64 = src.split(',')[1];
+      const ext = src.includes('image/png') ? 'png' : 'jpg';
+      folder.file(`${label}.${ext}`, base64, { base64: true });
     });
   });
-  showToast(`✅ 계기판 사진 ${list.length}건 다운로드`);
+
+  const blob = await zip.generateAsync({ type: 'blob' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = `반납사진_전체_${today()}.zip`;
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a); URL.revokeObjectURL(url);
+  showToast(`✅ 사진 ${withPhotos.length}건 ZIP 다운로드 완료`);
 }
 
 // ============================================================
@@ -3546,6 +3708,13 @@ async function saveEmpEdit() {
 // ============================================================
 // 데이터 다운로드 (CSV)
 // ============================================================
+function toKorDate(dtStr) {
+  if (!dtStr) return '';
+  const d = new Date(dtStr);
+  if (isNaN(d)) return dtStr;
+  return `${d.getFullYear()}년 ${d.getMonth()+1}월 ${d.getDate()}일 ${String(d.getHours()).padStart(2,'0')}시${String(d.getMinutes()).padStart(2,'0')}분`;
+}
+
 function downloadRequestsCSV() {
   const bom = '\uFEFF';
   const headers = ['No.','날짜','팀','이용자','출발지','방문지','방문목적','수행일시','반납일시','반납시간','주행전계기판(km)','주행후계기판(km)','주행거리(km)','주차위치','차량','상태','비고'];
@@ -3556,8 +3725,8 @@ function downloadRequestsCSV() {
     const km = (r.meterBefore && r.meterAfter) ? r.meterAfter - r.meterBefore : '';
     return [
       i+1, r.date, r.dept, r.name, '', r.dest, r.purpose,
-      r.startTime ? r.startTime.replace('T',' ') : '',
-      r.endTime   ? r.endTime.replace('T',' ')   : '',
+      toKorDate(r.startTime),
+      toKorDate(r.endTime),
       r.time||'',
       r.meterBefore||'', r.meterAfter||'', km,
       r.parkingLocation||'', r.vehicle, statusLabel(r.status), r.returnMemo||''
@@ -3638,7 +3807,7 @@ function goToStatTab(type) {
       adminReqStatusFilter = 'inuse';
       // 필터 버튼 UI 업데이트
       document.querySelectorAll('#admin-requests .filter-btn').forEach(b => b.classList.remove('active'));
-      const inuseBtn = [...document.querySelectorAll('#admin-requests .filter-btn')].find(b => b.textContent.includes('사용중'));
+      const inuseBtn = [...document.querySelectorAll('#admin-requests .filter-btn')].find(b => b.textContent.includes('예약 확정'));
       if (inuseBtn) inuseBtn.classList.add('active');
     } else if (type === 'today') {
       adminReqStatusFilter = 'all';
@@ -3961,7 +4130,7 @@ function viewPhotos(id) {
 // HELPERS
 // ============================================================
 function statusLabel(s) {
-  return {available:'가용',inuse:'사용중',unavailable:'불가',returned:'반납완료',pending:'대기중',approved:'승인'}[s]||s;
+  return {available:'가용',inuse:'예약 확정',unavailable:'불가',returned:'반납완료',pending:'예약 대기중',approved:'승인'}[s]||s;
 }
 
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
